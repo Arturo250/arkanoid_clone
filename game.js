@@ -1,8 +1,8 @@
 const canvas = document.getElementById( 'gameCanvas' );
 const ctx = canvas.getContext( '2d' );
 
-const BLOCK_COLS = 3;
-const BLOCK_ROWS = 3;
+const BLOCK_COLS = 10;
+const BLOCK_ROWS = 6;
 const BLOCK_WIDTH = 76;
 const BLOCK_HEIGHT = 24;
 const BLOCK_GAP = 4;

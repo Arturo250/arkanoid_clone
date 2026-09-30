@@ -45,6 +45,10 @@ function clamp( value, min, max ) {
 const keys = { left: false, right: false };
 
 window.addEventListener( 'keydown', ( e ) => {
+  if ( state.screen === 'gameover' || state.screen === 'victory' ) {
+    resetGame();
+    return;
+  }
   if ( e.key === 'ArrowLeft' ) keys.left = true;
   if ( e.key === 'ArrowRight' ) keys.right = true;
   if ( e.code === 'Space' ) launchBall();
@@ -62,7 +66,24 @@ canvas.addEventListener( 'mousemove', ( e ) => {
   state.paddle.x = clamp( mouseX - state.paddle.width / 2, 0, canvas.width - state.paddle.width );
 } );
 
-canvas.addEventListener( 'click', () => launchBall() );
+canvas.addEventListener( 'click', () => {
+  if ( state.screen === 'gameover' || state.screen === 'victory' ) {
+    resetGame();
+    return;
+  }
+  launchBall();
+} );
+
+function resetGame() {
+  state.screen = 'start';
+  state.score = 0;
+  state.lives = 3;
+  state.ballAttached = true;
+  state.paddle.x = ( canvas.width - state.paddle.width ) / 2;
+  state.ball.dx = 0;
+  state.ball.dy = 0;
+  state.bricks = buildBricks();
+}
 
 function launchBall() {
   if ( !state.ballAttached ) return;
@@ -152,9 +173,31 @@ function updateBall() {
 
     break; // un solo bloque por frame
   }
+
+  if ( state.bricks.length > 0 && state.bricks.every( ( b ) => !b.alive ) ) {
+    state.screen = 'victory';
+  }
+
+  // la pelota cayó por debajo de la pala sin ser golpeada: se pierde una vida
+  if ( ball.y - ball.radius > paddle.y + paddle.height ) {
+    loseLife();
+  }
+}
+
+function loseLife() {
+  state.lives -= 1;
+  state.paddle.x = ( canvas.width - state.paddle.width ) / 2;
+  state.ball.dx = 0;
+  state.ball.dy = 0;
+  state.ballAttached = true;
+
+  if ( state.lives <= 0 ) {
+    state.screen = 'gameover';
+  }
 }
 
 function update() {
+  if ( state.screen === 'gameover' || state.screen === 'victory' ) return;
   updatePaddle();
   updateBall();
 }
@@ -171,6 +214,8 @@ function draw() {
   drawSprite( ctx, 'ball', state.ball.x - state.ball.radius, state.ball.y - state.ball.radius, state.ball.radius * 2, state.ball.radius * 2 );
 
   if ( state.screen === 'playing' ) drawHUD();
+  if ( state.screen === 'gameover' ) drawMessageScreen( 'Game Over', 'Presioná una tecla o hacé click para reiniciar' );
+  if ( state.screen === 'victory' ) drawMessageScreen( '¡Victoria!', 'Presioná una tecla o hacé click para reiniciar' );
 }
 
 function drawHUD() {
@@ -180,6 +225,18 @@ function drawHUD() {
   ctx.fillText( `Puntaje: ${ state.score }`, 16, 28 );
   ctx.textAlign = 'right';
   ctx.fillText( `Vidas: ${ state.lives }`, canvas.width - 16, 28 );
+}
+
+function drawMessageScreen( title, subtitle ) {
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+  ctx.fillRect( 0, 0, canvas.width, canvas.height );
+
+  ctx.fillStyle = 'white';
+  ctx.textAlign = 'center';
+  ctx.font = '48px sans-serif';
+  ctx.fillText( title, canvas.width / 2, canvas.height / 2 - 16 );
+  ctx.font = '20px sans-serif';
+  ctx.fillText( subtitle, canvas.width / 2, canvas.height / 2 + 24 );
 }
 
 function loop() {

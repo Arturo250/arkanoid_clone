@@ -121,6 +121,37 @@ function updateBall() {
     ball.dy = -ball.speed * Math.cos( angle );
     ball.y = paddle.y - ball.radius;
   }
+
+  // colisión con bloques
+  for ( const brick of state.bricks ) {
+    if ( !brick.alive ) continue;
+
+    const hitsBrick =
+      ball.x + ball.radius > brick.x &&
+      ball.x - ball.radius < brick.x + brick.width &&
+      ball.y + ball.radius > brick.y &&
+      ball.y - ball.radius < brick.y + brick.height;
+
+    if ( !hitsBrick ) continue;
+
+    brick.alive = false;
+    state.score += 10;
+
+    const overlapLeft = ball.x + ball.radius - brick.x;
+    const overlapRight = brick.x + brick.width - ( ball.x - ball.radius );
+    const overlapTop = ball.y + ball.radius - brick.y;
+    const overlapBottom = brick.y + brick.height - ( ball.y - ball.radius );
+    const minOverlapX = Math.min( overlapLeft, overlapRight );
+    const minOverlapY = Math.min( overlapTop, overlapBottom );
+
+    if ( minOverlapX < minOverlapY ) {
+      ball.dx *= -1;
+    } else {
+      ball.dy *= -1;
+    }
+
+    break; // un solo bloque por frame
+  }
 }
 
 function update() {

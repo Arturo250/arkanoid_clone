@@ -169,6 +169,17 @@ function draw() {
 
   drawSprite( ctx, 'paddle', state.paddle.x, state.paddle.y, state.paddle.width, state.paddle.height );
   drawSprite( ctx, 'ball', state.ball.x - state.ball.radius, state.ball.y - state.ball.radius, state.ball.radius * 2, state.ball.radius * 2 );
+
+  if ( state.screen === 'playing' ) drawHUD();
+}
+
+function drawHUD() {
+  ctx.fillStyle = 'white';
+  ctx.font = '20px sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText( `Puntaje: ${ state.score }`, 16, 28 );
+  ctx.textAlign = 'right';
+  ctx.fillText( `Vidas: ${ state.lives }`, canvas.width - 16, 28 );
 }
 
 function loop() {

@@ -15,4 +15,5 @@ body {
 #gameCanvas {
   background: #000;
   display: block;
+  padding: 20px;
 }

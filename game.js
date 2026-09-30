@@ -1,8 +1,8 @@
 const canvas = document.getElementById( 'gameCanvas' );
 const ctx = canvas.getContext( '2d' );
 
-const BLOCK_COLS = 10;
-const BLOCK_ROWS = 6;
+const BLOCK_COLS = 3;
+const BLOCK_ROWS = 3;
 const BLOCK_WIDTH = 76;
 const BLOCK_HEIGHT = 24;
 const BLOCK_GAP = 4;
@@ -233,8 +233,8 @@ function draw() {
   if ( state.screen === 'playing' || state.screen === 'paused' ) drawHUD();
   if ( state.screen === 'start' ) drawMessageScreen( 'Arkanoid', 'Presiona Espacio para jugar' );
   if ( state.screen === 'paused' ) drawMessageScreen( 'Pausa', 'Presiona P para reanudar o presiona R para reiniciar' );
-  if ( state.screen === 'gameover' ) drawMessageScreen( 'Game Over', 'Presioná una tecla o hacé click para reiniciar' );
-  if ( state.screen === 'victory' ) drawMessageScreen( '¡Victoria!', 'Presioná una tecla o hacé click para reiniciar' );
+  if ( state.screen === 'gameover' ) drawMessageScreen( 'Game Over', 'Presioná una tecla o haz click para reiniciar' );
+  if ( state.screen === 'victory' ) drawMessageScreen( '¡Victoria!', 'Presioná una tecla o haz click para reiniciar' );
 }
 
 function drawHUD() {

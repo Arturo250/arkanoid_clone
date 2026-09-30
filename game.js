@@ -49,6 +49,18 @@ window.addEventListener( 'keydown', ( e ) => {
     resetGame();
     return;
   }
+
+  if ( e.code === 'Space' && state.screen === 'start' ) {
+    state.screen = 'playing';
+    return;
+  }
+
+  if ( e.key === 'p' || e.key === 'P' ) {
+    if ( state.screen === 'playing' ) state.screen = 'paused';
+    else if ( state.screen === 'paused' ) state.screen = 'playing';
+    return;
+  }
+
   if ( e.key === 'ArrowLeft' ) keys.left = true;
   if ( e.key === 'ArrowRight' ) keys.right = true;
   if ( e.code === 'Space' ) launchBall();
@@ -197,7 +209,7 @@ function loseLife() {
 }
 
 function update() {
-  if ( state.screen === 'gameover' || state.screen === 'victory' ) return;
+  if ( state.screen !== 'playing' ) return;
   updatePaddle();
   updateBall();
 }
@@ -214,6 +226,7 @@ function draw() {
   drawSprite( ctx, 'ball', state.ball.x - state.ball.radius, state.ball.y - state.ball.radius, state.ball.radius * 2, state.ball.radius * 2 );
 
   if ( state.screen === 'playing' ) drawHUD();
+  if ( state.screen === 'start' ) drawMessageScreen( 'Arkanoid', 'Presiona Espacio para jugar' );
   if ( state.screen === 'gameover' ) drawMessageScreen( 'Game Over', 'Presioná una tecla o hacé click para reiniciar' );
   if ( state.screen === 'victory' ) drawMessageScreen( '¡Victoria!', 'Presioná una tecla o hacé click para reiniciar' );
 }

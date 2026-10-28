@@ -19,6 +19,7 @@ const state = {
   paddle: { x: 350, y: 570, width: 100, height: 14, speed: 6 },
   ball: { x: 400, y: 556, radius: 8, dx: 0, dy: 0, speed: 4 },
   bricks: [],            // { x, y, width, height, color, alive }
+  explosions: [],        // { x, y, width, height, color, startTime }
 };
 
 function buildBricks() {
@@ -100,6 +101,7 @@ function resetGame() {
   state.ball.dx = 0;
   state.ball.dy = 0;
   state.bricks = buildBricks();
+  state.explosions = [];
 }
 
 function launchBall() {
@@ -174,6 +176,14 @@ function updateBall() {
 
     brick.alive = false;
     state.score += 10;
+    state.explosions.push( {
+      x: brick.x,
+      y: brick.y,
+      width: brick.width,
+      height: brick.height,
+      color: brick.color,
+      startTime: performance.now(),
+    } );
 
     const overlapLeft = ball.x + ball.radius - brick.x;
     const overlapRight = brick.x + brick.width - ( ball.x - ball.radius );
@@ -214,9 +224,15 @@ function loseLife() {
 }
 
 function update() {
+  updateExplosions();
   if ( state.screen !== 'playing' ) return;
   updatePaddle();
   updateBall();
+}
+
+function updateExplosions() {
+  const now = performance.now();
+  state.explosions = state.explosions.filter( ( explosion ) => now - explosion.startTime < EXPLOSION_DURATION );
 }
 
 function draw() {
@@ -229,6 +245,13 @@ function draw() {
 
   drawSprite( ctx, 'paddle', state.paddle.x, state.paddle.y, state.paddle.width, state.paddle.height );
   drawSprite( ctx, 'ball', state.ball.x - state.ball.radius, state.ball.y - state.ball.radius, state.ball.radius * 2, state.ball.radius * 2 );
+
+  const now = performance.now();
+  for ( const explosion of state.explosions ) {
+    const frameIndex = clamp( Math.floor( ( ( now - explosion.startTime ) / EXPLOSION_DURATION ) * 4 ), 0, 3 );
+    const frame = EXPLOSION_FRAMES[ explosion.color ][ frameIndex ];
+    drawFrame( ctx, frame, explosion.x, explosion.y, explosion.width, explosion.height );
+  }
 
   if ( state.screen === 'playing' || state.screen === 'paused' ) drawHUD();
   if ( state.screen === 'start' ) drawMessageScreen( 'Arkanoid', 'Presiona Espacio para jugar' );
